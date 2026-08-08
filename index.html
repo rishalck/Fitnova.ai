@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fitnova.ai | Premium AI Fitness Platform</title>
-  <meta name="description" content="FitNova is a world-class premium fitness platform featuring Nova AI human personal trainer, AI Mirror, Smart Kitchen, Energy & Recovery scores, Posture Analysis, and Future Body predictor.">
+  <title>Fitnova.ai Agent | Premium AI Fitness Platform</title>
+  <meta name="description" content="Fitnova.ai Agent is a world-class premium fitness platform featuring Nova AI human personal trainer, AI Mirror, Smart Kitchen, Energy & Recovery scores, Posture Analysis, and Future Body predictor.">
   <link rel="stylesheet" href="styles.css">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#00FF87">
@@ -53,7 +53,7 @@
       <!-- Step 1: Personal Profile -->
       <div id="step1" class="onboarding-step">
         <span class="badge-emerald" style="margin-bottom: 1rem;"><i data-feather="user"></i> Step 1 of 4</span>
-        <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Welcome to FitNova</h2>
+        <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Welcome to Fitnova.ai Agent</h2>
         <p style="color: var(--gray-400); margin-bottom: 2rem;">Let's introduce you to Nova AI, your dedicated personal trainer.</p>
         
         <div class="form-group">
@@ -103,58 +103,58 @@
             <input type="number" id="obTargetWeight" class="form-input" placeholder="70">
           </div>
           <div class="form-group">
-            <label class="form-label">Activity Level</label>
-            <select id="obActivity" class="form-select">
-              <option value="Sedentary">Sedentary (Desk Job)</option>
-              <option value="Lightly Active">Lightly Active (1-3 days/wk)</option>
-              <option value="Moderately Active" selected>Moderately Active (3-5 days/wk)</option>
-              <option value="Very Active">Very Active (6-7 days/wk)</option>
+            <label class="form-label">Primary Goal</label>
+            <select id="obGoal" class="form-select">
+              <option value="Muscle Gain">Muscle Gain & Hypertrophy</option>
+              <option value="Fat Loss">Fat Loss & Toning</option>
+              <option value="Endurance">Cardiovascular Endurance</option>
+              <option value="Longevity">Longevity & Posture</option>
             </select>
           </div>
         </div>
 
         <div style="display: flex; gap: 1rem; margin-top: 1rem;">
           <button onclick="nextStep(1)" class="btn btn-secondary" style="flex: 1;">Back</button>
-          <button onclick="nextStep(3)" class="btn btn-emerald" style="flex: 2;">Continue <i data-feather="arrow-right"></i></button>
+          <button onclick="nextStep(3)" class="btn btn-emerald" style="flex: 2;">Next <i data-feather="arrow-right"></i></button>
         </div>
       </div>
 
-      <!-- Step 3: Fitness Goals -->
+      <!-- Step 3: Fitness Level -->
       <div id="step3" class="onboarding-step" style="display: none;">
-        <span class="badge-emerald" style="margin-bottom: 1rem;"><i data-feather="target"></i> Step 3 of 4</span>
-        <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Select Primary Goal</h2>
-        <p style="color: var(--gray-400); margin-bottom: 1.5rem;">Nova AI will tailor your daily macros and workout programs accordingly.</p>
+        <span class="badge-emerald" style="margin-bottom: 1rem;"><i data-feather="zap"></i> Step 3 of 4</span>
+        <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Fitness Experience</h2>
+        <p style="color: var(--gray-400); margin-bottom: 2rem;">Help Nova AI calibrate your training volume.</p>
 
-        <div class="goals-grid">
-          <div class="goal-card selected" onclick="selectGoal(this, 'Muscle Gain')">
-            <i data-feather="shield" style="margin-bottom: 0.5rem; color: var(--emerald);"></i>
-            <h4>Muscle Gain</h4>
-          </div>
-          <div class="goal-card" onclick="selectGoal(this, 'Weight Loss')">
-            <i data-feather="trending-down" style="margin-bottom: 0.5rem; color: var(--emerald);"></i>
-            <h4>Weight Loss</h4>
-          </div>
-          <div class="goal-card" onclick="selectGoal(this, 'Body Recomposition')">
-            <i data-feather="refresh-cw" style="margin-bottom: 0.5rem; color: var(--emerald);"></i>
-            <h4>Body Recomp</h4>
-          </div>
-          <div class="goal-card" onclick="selectGoal(this, 'Strength Improvement')">
-            <i data-feather="zap" style="margin-bottom: 0.5rem; color: var(--emerald);"></i>
-            <h4>Strength</h4>
-          </div>
+        <div class="form-group">
+          <label class="form-label">Experience Level</label>
+          <select id="obLevel" class="form-select">
+            <option value="Beginner">Beginner (0-1 Years Training)</option>
+            <option value="Intermediate">Intermediate (1-3 Years Training)</option>
+            <option value="Advanced">Advanced (3+ Years Training)</option>
+          </select>
         </div>
 
-        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+        <div class="form-group">
+          <label class="form-label">Weekly Workout Frequency</label>
+          <select id="obDays" class="form-select">
+            <option value="3 Days">3 Days / Week (Optimal Recovery)</option>
+            <option value="4 Days">4 Days / Week (Upper / Lower Split)</option>
+            <option value="5 Days">5 Days / Week (Push / Pull / Legs)</option>
+            <option value="6 Days">6 Days / Week (Athletic Performance)</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
           <button onclick="nextStep(2)" class="btn btn-secondary" style="flex: 1;">Back</button>
-          <button onclick="nextStep(4)" class="btn btn-emerald" style="flex: 2;">Continue <i data-feather="arrow-right"></i></button>
+          <button onclick="nextStep(4)" class="btn btn-emerald" style="flex: 2;">Next <i data-feather="arrow-right"></i></button>
         </div>
       </div>
 
-      <!-- Step 4: Lifestyle & Food Preferences -->
+      <!-- Step 4: Lifestyle & Diet -->
       <div id="step4" class="onboarding-step" style="display: none;">
-        <span class="badge-emerald" style="margin-bottom: 1rem;"><i data-feather="clock"></i> Step 4 of 4</span>
-        <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Sleep & Food Preferences</h2>
-        <p style="color: var(--gray-400); margin-bottom: 2rem;">Final details for personalized daily coaching.</p>
+        <span class="badge-emerald" style="margin-bottom: 1rem;"><i data-feather="check-square"></i> Step 4 of 4</span>
+        <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Lifestyle & Nutrition</h2>
+        <p style="color: var(--gray-400); margin-bottom: 2rem;">Tailor your meal plans and smart recovery engine.</p>
 
         <div class="form-group">
           <label class="form-label">Typical Sleep Schedule</label>
@@ -173,7 +173,7 @@
 
         <div style="display: flex; gap: 1rem; margin-top: 2rem;">
           <button onclick="nextStep(3)" class="btn btn-secondary" style="flex: 1;">Back</button>
-          <button onclick="finishOnboarding()" class="btn btn-emerald" style="flex: 2;">Launch FitNova <i data-feather="check-circle"></i></button>
+          <button onclick="finishOnboarding()" class="btn btn-emerald" style="flex: 2;">Launch Fitnova.ai Agent <i data-feather="check-circle"></i></button>
         </div>
       </div>
 
@@ -183,8 +183,8 @@
   <!-- APP HEADER -->
   <header class="app-header">
     <a href="#" class="logo-wrap">
-      <img src="assets/logo.jpg" alt="FitNova" class="logo-img">
-      <div class="logo-text">FIT<span>NOVA</span></div>
+      <img src="assets/logo.jpg" alt="Fitnova.ai Agent" class="logo-img">
+      <div class="logo-text">FITNOVA<span>.AI AGENT</span></div>
     </a>
 
     <nav class="nav-tabs">
