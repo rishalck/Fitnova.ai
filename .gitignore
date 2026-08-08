@@ -1,0 +1,6 @@
+node_modules/
+.netlify/
+*.zip
+fitnova_deploy.zip
+fitnova_single.zip
+fitnova_standalone.html
