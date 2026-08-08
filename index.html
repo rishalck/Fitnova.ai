@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitNova | Premium AI Fitness Platform</title>
+  <meta name="description" content="FitNova is a world-class premium fitness platform featuring Nova AI human personal trainer, AI Mirror, Smart Kitchen, Energy & Recovery scores, Posture Analysis, and Future Body predictor.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#00FF87">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
+      });
+    }
+  </script>
+</head>
+<body>
+
+  <!-- FULL-SCREEN FOCUS MODE OVERLAY -->
+  <div id="focusModal" class="focus-overlay">
+    <span class="badge-emerald" style="margin-bottom: 1rem;"><i data-feather="target"></i> FOCUS MODE ACTIVE</span>
+    <h1 style="font-size: 3rem;" id="focusExerciseTitle">Explosive Push-Ups</h1>
+    <p style="color: var(--gray-400); font-size: 1.1rem; margin-top: 0.5rem;" id="focusQuote">"Discipline is choosing between what you want now and what you want most."</p>
+
+    <div class="focus-clock" id="focusTimerDisplay">00:45</div>
+
+    <div style="display: flex; gap: 1.5rem; align-items: center;">
+      <button onclick="pauseFocusTimer()" id="focusPauseBtn" class="btn btn-secondary"><i data-feather="pause"></i> Pause</button>
+      <button onclick="completeFocusSet()" class="btn btn-emerald"><i data-feather="check-circle"></i> Complete Set</button>
+      <button onclick="exitFocusMode()" class="btn btn-secondary"><i data-feather="x"></i> Exit Focus</button>
+    </div>
+
+    <div style="margin-top: 3rem; color: var(--gray-400);" class="mono">
+      SET <span id="focusSetNum" class="text-emerald">1</span> OF 4 | REST COUNTDOWN: <span id="focusRestDisplay" class="text-emerald">60s</span>
+    </div>
+  </div>
+
+  <!-- ONBOARDING WELCOME MODAL -->
+  <div id="onboardingModal" class="onboarding-overlay">
+    <div class="onboarding-modal glass-card highlight">
+      <div class="step-indicator">
+        <div id="stepBar1" class="step-bar filled"></div>
+        <div id="stepBar2" class="step-bar"></div>
+        <div id="stepBar3" class="step-bar"></div>
+        <div id="stepBar4" class="step-bar"></div>
+      </div>
+
+      <!-- Step 1: Personal Profile -->
+      <div id="step1" class="onboarding-step">
+        <span class="badge-emerald" style="margin-bottom: 1rem;"><i data-feather="user"></i> Step 1 of 4</span>
+        <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Welcome to FitNova</h2>
+        <p style="color: var(--gray-400); margin-bottom: 2rem;">Let's introduce you to Nova AI, your dedicated personal trainer.</p>
+        
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" id="obName" class="form-input" placeholder="e.g. Alex Morgan">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label">Age</label>
+            <input type="number" id="obAge" class="form-input" placeholder="28">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Gender</label>
+            <select id="obGender" class="form-select">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Non-Binary">Non-Binary</option>
+            </select>
+          </div>
+        </div>
+
+        <button onclick="nextStep(2)" class="btn btn-emerald" style="width: 100%; margin-top: 1rem;">
+          Continue <i data-feather="arrow-right"></i>
+        </button>
+      </div>
+
+      <!-- Step 2: Physical Metrics -->
+      <div id="step2" class="onboarding-step" style="display: none;">
+        <span class="badge-emerald" style="margin-bottom: 1rem;"><i data-feather="activity"></i> Step 2 of 4</span>
+        <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Physical Metrics</h2>
+        <p style="color: var(--gray-400); margin-bottom: 2rem;">Nova AI uses these biometrics to calculate your daily energy expenditure.</p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label">Height (cm)</label>
+            <input type="number" id="obHeight" class="form-input" placeholder="178">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Current Weight (kg)</label>
+            <input type="number" id="obWeight" class="form-input" placeholder="75">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label">Target Weight (kg)</label>
+            <input type="number" id="obTargetWeight" class="form-input" placeholder="70">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Activity Level</label>
+            <select id="obActivity" class="form-select">
+              <option value="Sedentary">Sedentary (Desk Job)</option>
+              <option value="Lightly Active">Lightly Active (1-3 days/wk)</option>
+              <option value="Moderately Active" selected>Moderately Active (3-5 days/wk)</option>
+              <option value="Very Active">Very Active (6-7 days/wk)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+          <button onclick="nextStep(1)" class="btn btn-secondary" style="flex: 1;">Back</button>
+          <button onclick="nextStep(3)" class="btn btn-emerald" style="flex: 2;">Continue <i data-feather="arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Step 3: Fitness Goals -->
+      <div id="step3" class="onboarding-step" style="display: none;">
+        <span class="badge-emerald" style="margin-bottom: 1rem;"><i data-feather="target"></i> Step 3 of 4</span>
+        <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Select Primary Goal</h2>
+        <p style="color: var(--gray-400); margin-bottom: 1.5rem;">Nova AI will tailor your daily macros and workout programs accordingly.</p>
+
+        <div class="goals-grid">
+          <div class="goal-card selected" onclick="selectGoal(this, 'Muscle Gain')">
+            <i data-feather="shield" style="margin-bottom: 0.5rem; color: var(--emerald);"></i>
+            <h4>Muscle Gain</h4>
+          </div>
+          <div class="goal-card" onclick="selectGoal(this, 'Weight Loss')">
+            <i data-feather="trending-down" style="margin-bottom: 0.5rem; color: var(--emerald);"></i>
+            <h4>Weight Loss</h4>
+          </div>
+          <div class="goal-card" onclick="selectGoal(this, 'Body Recomposition')">
+            <i data-feather="refresh-cw" style="margin-bottom: 0.5rem; color: var(--emerald);"></i>
+            <h4>Body Recomp</h4>
+          </div>
+          <div class="goal-card" onclick="selectGoal(this, 'Strength Improvement')">
+            <i data-feather="zap" style="margin-bottom: 0.5rem; color: var(--emerald);"></i>
+            <h4>Strength</h4>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+          <button onclick="nextStep(2)" class="btn btn-secondary" style="flex: 1;">Back</button>
+          <button onclick="nextStep(4)" class="btn btn-emerald" style="flex: 2;">Continue <i data-feather="arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Step 4: Lifestyle & Food Preferences -->
+      <div id="step4" class="onboarding-step" style="display: none;">
+        <span class="badge-emerald" style="margin-bottom: 1rem;"><i data-feather="clock"></i> Step 4 of 4</span>
+        <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Sleep & Food Preferences</h2>
+        <p style="color: var(--gray-400); margin-bottom: 2rem;">Final details for personalized daily coaching.</p>
+
+        <div class="form-group">
+          <label class="form-label">Typical Sleep Schedule</label>
+          <select id="obSleepSchedule" class="form-select">
+            <option value="7-8 Hours (Optimal)">7-8 Hours (Optimal)</option>
+            <option value="6-7 Hours">6-7 Hours</option>
+            <option value="8+ Hours">8+ Hours</option>
+            <option value="Under 6 Hours">Under 6 Hours (Requires Recovery)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Dietary & Food Preferences</label>
+          <input type="text" id="obDiet" class="form-input" placeholder="e.g. High Protein, Mediterranean, Vegan, Keto">
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+          <button onclick="nextStep(3)" class="btn btn-secondary" style="flex: 1;">Back</button>
+          <button onclick="finishOnboarding()" class="btn btn-emerald" style="flex: 2;">Launch FitNova <i data-feather="check-circle"></i></button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- APP HEADER -->
+  <header class="app-header">
+    <a href="#" class="logo-wrap">
+      <img src="assets/logo.jpg" alt="FitNova" class="logo-img">
+      <div class="logo-text">FIT<span>NOVA</span></div>
+    </a>
+
+    <nav class="nav-tabs">
+      <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn active"><i data-feather="grid"></i> Dashboard</button>
+      <button onclick="switchTab('nova-ai')" id="tab-nova-ai" class="tab-btn"><i data-feather="message-square"></i> Nova AI</button>
+      <button onclick="switchTab('mirror')" id="tab-mirror" class="tab-btn"><i data-feather="camera"></i> AI Mirror</button>
+      <button onclick="switchTab('kitchen')" id="tab-kitchen" class="tab-btn"><i data-feather="coffee"></i> Kitchen Mode</button>
+      <button onclick="switchTab('posture')" id="tab-posture" class="tab-btn"><i data-feather="user-check"></i> Posture AI</button>
+      <button onclick="switchTab('stress')" id="tab-stress" class="tab-btn"><i data-feather="smile"></i> Well-Being</button>
+      <button onclick="switchTab('future')" id="tab-future" class="tab-btn"><i data-feather="trending-up"></i> Future Body</button>
+      <button onclick="switchTab('restaurant')" id="tab-restaurant" class="tab-btn"><i data-feather="map-pin"></i> Restaurants</button>
+      <button onclick="switchTab('workouts')" id="tab-workouts" class="tab-btn"><i data-feather="activity"></i> Workouts</button>
+    </nav>
+
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <button onclick="copyShareLink()" class="btn btn-emerald" style="padding: 0.5rem 1rem; font-size: 0.8rem;">
+        <i data-feather="share-2"></i> Copy App Link
+      </button>
+
+      <div class="user-profile-badge" onclick="openOnboardingModal()">
+        <div class="user-avatar" id="hdrAvatar">A</div>
+        <div>
+          <div style="font-size: 0.85rem; font-weight: 700;" id="hdrName">Alex Morgan</div>
+          <div style="font-size: 0.7rem; color: var(--emerald);" id="hdrGoal">Muscle Gain</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN VIEW PANELS -->
+  <main class="main-container">
+
+    <!-- 1. DASHBOARD VIEW -->
+    <div id="view-dashboard" class="view-panel active">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div>
+          <span class="badge-emerald" style="margin-bottom: 0.5rem;"><i data-feather="check"></i> System Active</span>
+          <h1 style="font-size: 2.2rem;">Daily Overview & Scores</h1>
+        </div>
+        <button onclick="triggerQuickCheckIn()" class="btn btn-emerald"><i data-feather="plus"></i> Quick Daily Check-In</button>
+      </div>
+
+      <!-- ENERGY SCORE & RECOVERY SCORE GAUGES -->
+      <div class="score-gauges-row">
+        <div class="score-card glass-card highlight">
+          <div class="score-circle">
+            <span class="score-val" id="energyScoreVal">88</span>
+            <span style="font-size: 0.65rem; color: var(--emerald);" class="mono">OPTIMAL</span>
+          </div>
+          <div>
+            <h3 style="font-size: 1.3rem;">Energy Score</h3>
+            <p style="color: var(--gray-400); font-size: 0.85rem; margin-top: 0.35rem;" id="energyReason">
+              Excellent sleep quality (7.8h) + High hydration status + Active workout completion.
+            </p>
+          </div>
+        </div>
+
+        <div class="score-card glass-card highlight">
+          <div class="score-circle" style="border-color: var(--white);">
+            <span class="score-val" id="recoveryScoreVal">92</span>
+            <span style="font-size: 0.65rem; color: var(--gray-300);" class="mono">PRIME</span>
+          </div>
+          <div>
+            <h3 style="font-size: 1.3rem;">Recovery Score</h3>
+            <p style="color: var(--gray-400); font-size: 0.85rem; margin-top: 0.35rem;" id="recoveryReason">
+              High HRV spectrum (84ms) + Low CNS fatigue + Optimal 8-hour sleep recovery.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Metric Cards -->
+      <div class="metrics-row">
+        <div class="metric-card glass-card">
+          <div class="metric-header">
+            <span class="text-gray" style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Calorie Target</span>
+            <i data-feather="zap" class="text-emerald"></i>
+          </div>
+          <div class="metric-val"><span id="dashCalLogged">1,420</span> <span style="font-size: 1rem; color: var(--gray-400);" id="dashCalTarget">/ 2,400 kcal</span></div>
+          <div class="progress-track"><div id="calFill" class="progress-fill" style="width: 59%;"></div></div>
+        </div>
+
+        <div class="metric-card glass-card">
+          <div class="metric-header">
+            <span class="text-gray" style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Protein Intake</span>
+            <i data-feather="shield" class="text-emerald"></i>
+          </div>
+          <div class="metric-val"><span id="dashProtLogged">115</span> <span style="font-size: 1rem; color: var(--gray-400);" id="dashProtTarget">/ 170 g</span></div>
+          <div class="progress-track"><div id="protFill" class="progress-fill" style="width: 67%;"></div></div>
+        </div>
+
+        <!-- HYDRATION INTELLIGENCE METRIC CARD -->
+        <div class="metric-card glass-card">
+          <div class="metric-header">
+            <span class="text-gray" style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Hydration Intel</span>
+            <i data-feather="droplet" class="text-emerald"></i>
+          </div>
+          <div class="metric-val"><span id="dashWaterLogged">2.25</span> <span style="font-size: 1rem; color: var(--gray-400);" id="dashWaterTarget">/ 3.5 L</span></div>
+          <div style="display: flex; gap: 0.4rem; margin-top: 0.5rem;">
+            <select id="weatherSelect" onchange="updateHydrationTarget()" style="background: rgba(255,255,255,0.05); color: #FFF; border: 1px solid var(--border-dark); font-size: 0.75rem; border-radius: 4px; padding: 0.2rem;">
+              <option value="1.0">Cool Weather</option>
+              <option value="1.15" selected>Moderate (26°C)</option>
+              <option value="1.3">Hot (32°C)</option>
+              <option value="1.5">Extreme Heat</option>
+            </select>
+            <button onclick="addWater(0.25)" class="btn btn-secondary" style="padding: 0.2rem 0.4rem; font-size: 0.75rem;">+250ml</button>
+          </div>
+        </div>
+
+        <div class="metric-card glass-card">
+          <div class="metric-header">
+            <span class="text-gray" style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Target Weight Progress</span>
+            <i data-feather="target" class="text-emerald"></i>
+          </div>
+          <div class="metric-val"><span id="dashCurrentWeight">75.0</span> <span style="font-size: 1rem; color: var(--gray-400);" id="dashTargetWeight">-> 70.0 kg</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width: 80%;"></div></div>
+        </div>
+      </div>
+
+      <!-- Dashboard Grid -->
+      <div class="dashboard-grid">
+        <div class="glass-card" style="padding: 2rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3>Weekly Calorie & Macro Adherence Report</h3>
+            <span class="mono text-emerald" style="font-size: 0.8rem;">UPDATED LIVE</span>
+          </div>
+          <canvas id="weeklyChart" height="220"></canvas>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+          <!-- Nova AI Daily Suggestion -->
+          <div class="glass-card highlight" style="padding: 1.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+              <img src="assets/ai_coach.jpg" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--emerald);">
+              <div>
+                <h4 style="font-size: 1rem;">Nova AI Insight</h4>
+                <span style="font-size: 0.75rem; color: var(--gray-400);" class="mono">RECOMMENDATION</span>
+              </div>
+            </div>
+            <p style="color: var(--gray-300); font-size: 0.9rem; line-height: 1.5;" id="dashNovaTip">
+              "Your Energy Score is 88/100 today! You have 420 calories remaining. Consume a lean protein dinner to maximize muscle synthesis."
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. NOVA AI COACH VIEW -->
+    <div id="view-nova-ai" class="view-panel">
+      <div class="nova-ai-container">
+        <div class="trainer-profile-card glass-card">
+          <img src="assets/ai_coach.jpg" alt="Nova AI Trainer" class="trainer-avatar-img">
+          <h3 style="font-size: 1.4rem; margin-bottom: 0.25rem;">Nova AI</h3>
+          <span style="color: var(--emerald); font-size: 0.85rem; font-weight: 600;" class="mono">PERSONAL FITNESS COACH</span>
+          <p style="color: var(--gray-400); font-size: 0.85rem; margin: 1rem 0 1.5rem 0;">
+            Friendly, experienced, and available 24/7 to answer nutrition questions, adjust workouts, and optimize recovery.
+          </p>
+
+          <button onclick="startDailyCheckInFlow()" class="btn btn-emerald" style="width: 100%; font-size: 0.85rem;">
+            <i data-feather="check-square"></i> Start Daily Check-In
+          </button>
+        </div>
+
+        <div class="chat-thread glass-card">
+          <div style="padding: 1.25rem; border-bottom: 1px solid var(--border-dark); display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span class="status-dot"></span>
+              <span style="font-size: 0.9rem; font-weight: 700;">Nova AI Live Session</span>
+            </div>
+            <span class="mono text-gray" style="font-size: 0.75rem;">CONNECTED</span>
+          </div>
+
+          <div id="novaChatBody" class="chat-body">
+            <div class="msg nova">
+              Hi Alex! I'm <strong>Nova AI</strong>. Your Energy Score is 88/100 today. Ask me any training or nutrition questions, or type 'checkin' to log your daily meals!
+            </div>
+          </div>
+
+          <form id="novaChatForm" style="padding: 1rem; border-top: 1px solid var(--border-dark); display: flex; gap: 0.75rem;">
+            <input type="text" id="novaChatInput" class="form-input" placeholder="Ask Nova AI anything..." autocomplete="off">
+            <button type="submit" class="btn btn-emerald" style="padding: 0.85rem 1.25rem;"><i data-feather="send"></i></button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. AI MIRROR MODE VIEW -->
+    <div id="view-mirror" class="view-panel">
+      <div class="section-header" style="text-align: center; margin-bottom: 2rem;">
+        <span class="badge-emerald" style="margin-bottom: 0.5rem;"><i data-feather="camera"></i> AI Visual Mirror Mode</span>
+        <h1 style="font-size: 2.2rem;">Weekly Progress & Transformation Timeline</h1>
+        <p style="color: var(--gray-400);">Upload weekly body photographs. Nova AI analyzes posture improvement, muscle growth, and body composition changes.</p>
+      </div>
+
+      <div class="glass-card" style="padding: 2rem; margin-bottom: 2rem;">
+        <div class="dropzone" onclick="document.getElementById('mirrorInput').click()">
+          <i data-feather="camera" style="width: 44px; height: 44px; color: var(--emerald); margin-bottom: 0.5rem;"></i>
+          <h3>Upload This Week's Progress Photo</h3>
+          <p style="color: var(--gray-400); font-size: 0.85rem;">Nova AI will compare with previous weeks</p>
+          <input type="file" id="mirrorInput" accept="image/*" style="display: none;" onchange="handleMirrorUpload(event)">
+        </div>
+      </div>
+
+      <div class="timeline-grid">
+        <div class="timeline-card glass-card">
+          <span class="badge-emerald">Week 1 (Baseline)</span>
+          <img src="assets/ai_coach.jpg" class="timeline-img" style="margin-top: 1rem;">
+          <h4>Weight: 75.0 kg</h4>
+          <p style="font-size: 0.85rem; color: var(--gray-400);">Body Fat: 18.5% | Posture: Neutral</p>
+        </div>
+        <div class="timeline-card glass-card">
+          <span class="badge-emerald">Week 4 (Progress)</span>
+          <img src="assets/ai_coach.jpg" class="timeline-img" style="margin-top: 1rem;">
+          <h4>Weight: 73.2 kg</h4>
+          <p style="font-size: 0.85rem; color: var(--gray-400);">Body Fat: 16.8% | Shoulder Alignment: +4%</p>
+        </div>
+        <div class="timeline-card glass-card highlight">
+          <span class="badge-emerald">Week 8 (Latest AI Analysis)</span>
+          <img src="assets/ai_coach.jpg" class="timeline-img" style="margin-top: 1rem;">
+          <h4 class="text-emerald">Weight: 71.5 kg</h4>
+          <p style="font-size: 0.85rem; color: var(--gray-300);">Muscle Growth: +1.2kg | Core Definition: High</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. SMART KITCHEN MODE VIEW -->
+    <div id="view-kitchen" class="view-panel">
+      <div style="max-width: 900px; margin: 0 auto;">
+        <div class="section-header" style="text-align: center; margin-bottom: 2rem;">
+          <span class="badge-emerald" style="margin-bottom: 0.5rem;"><i data-feather="coffee"></i> Smart Kitchen Mode</span>
+          <h1 style="font-size: 2.2rem;">Cook With Available Pantry Ingredients</h1>
+          <p style="color: var(--gray-400);">Select the ingredients you currently have at home. Nova AI will generate meal plans using ONLY those foods.</p>
+        </div>
+
+        <div class="glass-card" style="padding: 2.5rem;">
+          <h4 style="font-size: 1.1rem;">Select Ingredients in Your Kitchen:</h4>
+          <div class="chips-grid">
+            <div class="chip selected" onclick="toggleChip(this, 'Eggs')">🥚 Eggs</div>
+            <div class="chip selected" onclick="toggleChip(this, 'Chicken')">🍗 Chicken Breast</div>
+            <div class="chip selected" onclick="toggleChip(this, 'Rice')">🍚 Jasmine Rice</div>
+            <div class="chip" onclick="toggleChip(this, 'Milk')">🥛 Milk</div>
+            <div class="chip" onclick="toggleChip(this, 'Fish')">🐟 Salmon/Fish</div>
+            <div class="chip selected" onclick="toggleChip(this, 'Spinach')">🥬 Spinach</div>
+            <div class="chip" onclick="toggleChip(this, 'Oats')">🌾 Oats</div>
+            <div class="chip" onclick="toggleChip(this, 'Avocado')">🥑 Avocado</div>
+            <div class="chip selected" onclick="toggleChip(this, 'Whey')">🥛 Whey Protein</div>
+          </div>
+
+          <button onclick="generateKitchenMeal()" class="btn btn-emerald" style="width: 100%; margin-top: 1.5rem;">
+            <i data-feather="cpu"></i> Generate Custom Recipe with Selected Ingredients
+          </button>
+
+          <div id="kitchenResult" style="display: none; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-dark);">
+            <span class="badge-emerald" id="kitchenRecipeTitle">Nova AI Custom Recipe: High-Protein Scramble & Rice</span>
+            <p style="color: var(--gray-300); font-size: 0.95rem; margin-top: 0.75rem;" id="kitchenRecipeDesc">
+              Combines 4 Eggs, 150g Chicken Breast, and 100g Rice with Spinach. Provides 52g Protein and 580 kcal.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. AI VISION POSTURE ANALYSIS VIEW -->
+    <div id="view-posture" class="view-panel">
+      <div style="max-width: 900px; margin: 0 auto;">
+        <div class="section-header" style="text-align: center; margin-bottom: 2rem;">
+          <span class="badge-emerald" style="margin-bottom: 0.5rem;"><i data-feather="user-check"></i> Computer Vision Posture Engine</span>
+          <h1 style="font-size: 2.2rem;">AI Posture & Movement Form Analysis</h1>
+          <p style="color: var(--gray-400);">Upload images or videos of your posture, squat form, or push-up execution for sub-millimeter biomechanical feedback.</p>
+        </div>
+
+        <div class="glass-card" style="padding: 2.5rem;">
+          <div class="posture-canvas-wrap">
+            <canvas id="postureAnalysisCanvas" style="width: 100%; height: 100%; border-radius: 16px;"></canvas>
+          </div>
+
+          <div style="display: flex; gap: 1.5rem; margin-top: 1.5rem;">
+            <button onclick="analyzePostureType('Back & Neck Alignment')" class="btn btn-secondary" style="flex: 1;">Analyze Spine Alignment</button>
+            <button onclick="analyzePostureType('Squat Depth & Form')" class="btn btn-emerald" style="flex: 1;">Analyze Squat Form</button>
+          </div>
+
+          <div id="postureFeedbackBox" style="margin-top: 1.5rem; padding: 1.25rem; background: rgba(0,255,135,0.05); border-radius: 12px; border: 1px solid var(--border-emerald);">
+            <h4 style="color: var(--emerald);" id="postureTitle">Analysis: Spine & Neck Alignment</h4>
+            <p style="color: var(--gray-300); font-size: 0.9rem; margin-top: 0.5rem;" id="postureDesc">
+              "Back posture is 96.4% optimal. Slight forward head tilt of 2.1 degrees detected. Perform neck retractions to relieve cervical pressure."
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. STRESS & WELL-BEING ANALYSIS VIEW -->
+    <div id="view-stress" class="view-panel">
+      <div style="max-width: 800px; margin: 0 auto;">
+        <div class="section-header" style="text-align: center; margin-bottom: 2rem;">
+          <span class="badge-emerald" style="margin-bottom: 0.5rem;"><i data-feather="smile"></i> Holistic Well-Being</span>
+          <h1 style="font-size: 2.2rem;">Stress & Mental Energy Assessment</h1>
+          <p style="color: var(--gray-400);">Log your current mood, stress level, and mental focus. Nova AI provides personalized recovery protocols.</p>
+        </div>
+
+        <div class="glass-card" style="padding: 2.5rem;">
+          <div class="form-group">
+            <label class="form-label">Current Stress Level (1 = Calm, 10 = High Stress)</label>
+            <input type="range" id="stressSlider" min="1" max="10" value="3" style="width: 100%; accent-color: var(--emerald);" oninput="document.getElementById('stressNum').innerText = this.value">
+            <div style="text-align: right; color: var(--emerald);" class="mono">Value: <span id="stressNum">3</span>/10</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mental Energy Level</label>
+            <select id="moodSelect" class="form-select">
+              <option value="High Energy & Focus">High Energy & Focus</option>
+              <option value="Moderate Energy">Moderate Energy</option>
+              <option value="Mental Fatigue">Mental Fatigue / Burnout Risk</option>
+            </select>
+          </div>
+
+          <button onclick="analyzeStressWellbeing()" class="btn btn-emerald" style="width: 100%; margin-top: 1rem;">
+            <i data-feather="heart"></i> Generate Holistic Well-Being Protocol
+          </button>
+
+          <div id="stressResultBox" style="display: none; margin-top: 2rem; padding: 1.5rem; background: rgba(255,255,255,0.03); border-radius: 12px;">
+            <h4 class="text-emerald" id="stressPrescriptionTitle">Nova AI Well-Being Prescription</h4>
+            <p style="color: var(--gray-300); font-size: 0.9rem; margin-top: 0.5rem;" id="stressPrescriptionDesc">
+              "Low stress (3/10) detected. Your mental focus is prime. Engage in 15 minutes of light mobility work and maintain hydration."
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. FUTURE BODY PREDICTIVE MODE VIEW -->
+    <div id="view-future" class="view-panel">
+      <div style="max-width: 1000px; margin: 0 auto;">
+        <div class="section-header" style="text-align: center; margin-bottom: 2rem;">
+          <span class="badge-emerald" style="margin-bottom: 0.5rem;"><i data-feather="trending-up"></i> Predictive Transformation Engine</span>
+          <h1 style="font-size: 2.2rem;">Future Body Predictive Forecast</h1>
+          <p style="color: var(--gray-400);">Predict your physiological progress over the next 30, 90, 180, and 365 days based on your current macro compliance.</p>
+        </div>
+
+        <div class="future-grid">
+          <div class="future-card glass-card">
+            <span class="mono text-emerald">DAY 30</span>
+            <h3 style="font-size: 1.5rem; margin: 0.5rem 0;">73.8 kg</h3>
+            <p style="font-size: 0.85rem; color: var(--gray-400);">Fat Loss: -1.2kg | Muscle Gain: +0.6kg | Strength: +5%</p>
+          </div>
+
+          <div class="future-card glass-card">
+            <span class="mono text-emerald">DAY 90</span>
+            <h3 style="font-size: 1.5rem; margin: 0.5rem 0;">72.0 kg</h3>
+            <p style="font-size: 0.85rem; color: var(--gray-400);">Fat Loss: -3.0kg | Muscle Gain: +1.8kg | Core Visually Lean</p>
+          </div>
+
+          <div class="future-card glass-card highlight">
+            <span class="mono text-emerald">DAY 180</span>
+            <h3 style="font-size: 1.5rem; margin: 0.5rem 0;" class="text-emerald">70.2 kg</h3>
+            <p style="font-size: 0.85rem; color: var(--gray-300);">TARGET MET | Body Fat: 14% | Peak Muscle Density</p>
+          </div>
+
+          <div class="future-card glass-card">
+            <span class="mono text-emerald">1 YEAR</span>
+            <h3 style="font-size: 1.5rem; margin: 0.5rem 0;">71.0 kg</h3>
+            <p style="font-size: 0.85rem; color: var(--gray-400);">Athletic Recomp | Body Fat: 12% | Elite Strength State</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. HEALTHY RESTAURANT MODE VIEW -->
+    <div id="view-restaurant" class="view-panel">
+      <div style="max-width: 900px; margin: 0 auto;">
+        <div class="section-header" style="text-align: center; margin-bottom: 2rem;">
+          <span class="badge-emerald" style="margin-bottom: 0.5rem;"><i data-feather="map-pin"></i> Healthy Restaurant Guide</span>
+          <h1 style="font-size: 2.2rem;">Goal-Aligned Restaurant Dining Options</h1>
+          <p style="color: var(--gray-400);">Nova AI matches local healthy restaurant dishes with your exact remaining calorie & protein target.</p>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div class="restaurant-card glass-card highlight">
+            <div>
+              <span class="badge-emerald">EXACT MATCH (98%)</span>
+              <h3 style="font-size: 1.3rem; margin: 0.35rem 0;">Sweetgreen - Harvest Chicken Bowl</h3>
+              <p style="color: var(--gray-400); font-size: 0.88rem;">Roasted Chicken, Warm Wild Rice, Sweet Potatoes, Apples, Goat Cheese.</p>
+            </div>
+            <div style="text-align: right;" class="mono">
+              <h3 class="text-emerald">645 kcal</h3>
+              <span style="font-size: 0.85rem; color: var(--gray-300);">48g Protein</span>
+            </div>
+          </div>
+
+          <div class="restaurant-card glass-card">
+            <div>
+              <span class="badge-emerald">HIGH PROTEIN</span>
+              <h3 style="font-size: 1.3rem; margin: 0.35rem 0;">Chipotle - Double Chicken Burrito Bowl</h3>
+              <p style="color: var(--gray-400); font-size: 0.88rem;">Double Chicken, Black Beans, Fajita Veggies, Fresh Tomato Salsa.</p>
+            </div>
+            <div style="text-align: right;" class="mono">
+              <h3 class="text-emerald">710 kcal</h3>
+              <span style="font-size: 0.85rem; color: var(--gray-300);">64g Protein</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. WORKOUT SECTION VIEW -->
+    <div id="view-workouts" class="view-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div>
+          <span class="badge-emerald" style="margin-bottom: 0.5rem;"><i data-feather="activity"></i> Tailored Training Engine</span>
+          <h1 style="font-size: 2.2rem;">Personalized Workouts</h1>
+        </div>
+      </div>
+
+      <div class="workout-grid">
+        <div class="workout-card glass-card">
+          <div>
+            <span class="exercise-tag">BODYWEIGHT STRENGTH</span>
+            <h3 style="font-size: 1.4rem; margin: 0.5rem 0;">Explosive Push-Ups & Core</h3>
+            <p style="color: var(--gray-400); font-size: 0.88rem; margin-bottom: 1.5rem;">4 Sets x 15 Reps. Build chest, triceps, and anterior shoulder power.</p>
+          </div>
+          <button onclick="launchFocusMode('Explosive Push-Ups', 45)" class="btn btn-emerald"><i data-feather="target"></i> Launch Focus Mode</button>
+        </div>
+
+        <div class="workout-card glass-card">
+          <div>
+            <span class="exercise-tag">LOWER BODY POWER</span>
+            <h3 style="font-size: 1.4rem; margin: 0.5rem 0;">Bodyweight Deep Squats</h3>
+            <p style="color: var(--gray-400); font-size: 0.88rem; margin-bottom: 1.5rem;">4 Sets x 20 Reps. Maximizes quad, glute, and hip flexor engagement.</p>
+          </div>
+          <button onclick="launchFocusMode('Deep Squats', 60)" class="btn btn-emerald"><i data-feather="target"></i> Launch Focus Mode</button>
+        </div>
+
+        <div class="workout-card glass-card">
+          <div>
+            <span class="exercise-tag">CORE STABILITY</span>
+            <h3 style="font-size: 1.4rem; margin: 0.5rem 0;">Isometric Plank Hold</h3>
+            <p style="color: var(--gray-400); font-size: 0.88rem; margin-bottom: 1.5rem;">3 Holds x 60 Seconds. Strengthens abdominal wall and lumbar stability.</p>
+          </div>
+          <button onclick="launchFocusMode('Isometric Plank', 60)" class="btn btn-emerald"><i data-feather="target"></i> Launch Focus Mode</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="app.js"></script>
+  <script>
+    feather.replace();
+  </script>
+</body>
+</html>
