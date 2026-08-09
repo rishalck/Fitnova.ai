@@ -42,7 +42,10 @@
 
   <!-- ONBOARDING WELCOME MODAL -->
   <div id="onboardingModal" class="onboarding-overlay">
-    <div class="onboarding-modal glass-card highlight">
+    <div class="onboarding-modal glass-card highlight" style="position: relative;">
+      <button onclick="document.getElementById('onboardingModal').style.display='none'" class="btn btn-secondary" style="position: absolute; top: 1rem; right: 1rem; padding: 0.4rem 0.7rem; font-size: 0.82rem; border-radius: 20px; z-index: 10;">
+        <i data-feather="x"></i> Skip
+      </button>
       <div class="step-indicator">
         <div id="stepBar1" class="step-bar filled"></div>
         <div id="stepBar2" class="step-bar"></div>

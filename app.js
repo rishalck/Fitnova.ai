@@ -72,14 +72,25 @@ function selectGoal(element, goalName) {
 }
 
 function finishOnboarding() {
-  const name = document.getElementById('obName').value.trim();
-  const age = parseInt(document.getElementById('obAge').value) || 28;
-  const height = parseInt(document.getElementById('obHeight').value) || 178;
-  const weight = parseFloat(document.getElementById('obWeight').value) || 75;
-  const targetWeight = parseFloat(document.getElementById('obTargetWeight').value) || 70;
-  const activity = document.getElementById('obActivity').value;
-  const sleepSchedule = document.getElementById('obSleepSchedule').value;
-  const diet = document.getElementById('obDiet').value.trim() || "High Protein";
+  const obName = document.getElementById('obName');
+  const obAge = document.getElementById('obAge');
+  const obHeight = document.getElementById('obHeight');
+  const obWeight = document.getElementById('obWeight');
+  const obTargetWeight = document.getElementById('obTargetWeight');
+  const obGoal = document.getElementById('obGoal');
+  const obActivity = document.getElementById('obActivity');
+  const obSleepSchedule = document.getElementById('obSleepSchedule');
+  const obDiet = document.getElementById('obDiet');
+
+  const name = obName ? obName.value.trim() : "";
+  const age = obAge ? (parseInt(obAge.value) || 28) : 28;
+  const height = obHeight ? (parseInt(obHeight.value) || 178) : 178;
+  const weight = obWeight ? (parseFloat(obWeight.value) || 75) : 75;
+  const targetWeight = obTargetWeight ? (parseFloat(obTargetWeight.value) || 70) : 70;
+  const goal = obGoal ? obGoal.value : (userProfile.selectedGoal || "Muscle Gain");
+  const activity = obActivity ? obActivity.value : "Moderately Active";
+  const sleepSchedule = obSleepSchedule ? obSleepSchedule.value : "7-8 Hours (Optimal)";
+  const diet = obDiet ? (obDiet.value.trim() || "High Protein") : "High Protein";
 
   userProfile.name = name || "Alex Morgan";
   userProfile.age = age;
@@ -87,7 +98,7 @@ function finishOnboarding() {
   userProfile.weight = weight;
   userProfile.targetWeight = targetWeight;
   userProfile.activity = activity;
-  userProfile.goal = userProfile.selectedGoal || "Muscle Gain";
+  userProfile.goal = goal;
   userProfile.sleepSchedule = sleepSchedule;
   userProfile.diet = diet;
 
@@ -95,10 +106,10 @@ function finishOnboarding() {
   let bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
   let tdee = bmr * (activity.includes("Very") ? 1.725 : activity.includes("Moderately") ? 1.55 : 1.375);
   
-  if (userProfile.goal === "Muscle Gain") {
+  if (userProfile.goal.includes("Muscle")) {
     userProfile.targetCalories = Math.round(tdee + 350);
     userProfile.targetProtein = Math.round(weight * 2.2);
-  } else if (userProfile.goal === "Weight Loss") {
+  } else if (userProfile.goal.includes("Fat") || userProfile.goal.includes("Loss")) {
     userProfile.targetCalories = Math.round(tdee - 450);
     userProfile.targetProtein = Math.round(weight * 2.0);
   } else {
@@ -109,9 +120,11 @@ function finishOnboarding() {
   saveProfileToStorage();
   updateUIFromState();
   calculateScores();
-  document.getElementById('onboardingModal').style.display = 'none';
 
-  showToast(`Welcome to FitNova, ${userProfile.name}! Nova AI is now active.`);
+  const modal = document.getElementById('onboardingModal');
+  if (modal) modal.style.display = 'none';
+
+  showToast(`Welcome to Fitnova.ai Agent, ${userProfile.name}!`);
 }
 
 function updateUIFromState() {
